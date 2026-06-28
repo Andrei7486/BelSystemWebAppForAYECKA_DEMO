@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BEL System — Live Demo</title>
+<style>
+:root {
+  --bg:#07090D; --surface:#0d1520; --surface2:#131e2e; --border:#1e3a4a;
+  --accent:#4ecdc4; --accent2:#6C63FF; --green:#3eba88; --yellow:#e0a040;
+  --red:#e05050; --grey:#4a7a8a; --text:#c8d8e8; --text2:#7a9ab0;
+  --text3:#3a5a6a; --radius:6px; --sidebar:158px; --amber:#e0a040;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;font-size:12px}
+
+/* TOP NAV */
+.topnav{background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;padding:0 16px;height:44px;flex-shrink:0}
+.logo-wrap{display:flex;align-items:center;gap:8px}
+.logo-icon{width:28px;height:28px;background:linear-gradient(135deg,#0d4a5a,#1a8a9a 40%,#4ecdc4);border-radius:5px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:11px;color:white;box-shadow:0 0 8px rgba(78,205,196,.3)}
+.logo-text{font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.5px}
+.logo-sub{font-size:9px;color:var(--text3)}
+.nav-div{width:1px;height:22px;background:var(--border)}
+.search-bar{flex:1;max-width:320px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:5px 10px;font-size:11px;color:var(--text2)}
+.nav-right{margin-left:auto;display:flex;gap:5px;align-items:center}
+.nav-icon{width:28px;height:28px;border-radius:4px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;color:var(--text2)}
+.avatar{width:28px;height:28px;border-radius:4px;background:linear-gradient(135deg,#1a6a7a,#4ecdc4);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:10px;color:#0a0d12;cursor:pointer}
+.dev-tag{font-size:9px;color:var(--text3);white-space:nowrap}
+
+/* LAYOUT */
+.layout{display:flex;flex:1;overflow:hidden}
+
+/* SIDEBAR */
+.sidebar{width:var(--sidebar);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:8px 0;flex-shrink:0}
+.sb-sec{padding:6px 10px 2px;font-size:9px;font-weight:700;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-top:4px}
+.sb-item{display:flex;align-items:center;gap:8px;padding:6px 14px;cursor:pointer;font-size:11px;color:var(--text2);transition:background .12s,color .12s;position:relative}
+.sb-item:hover{background:var(--surface2);color:var(--text)}
+.sb-item.active{background:rgba(78,205,196,.1);color:var(--accent);font-weight:600}
+.sb-item.active::before{content:'';position:absolute;left:0;top:4px;bottom:4px;width:2px;background:var(--accent);border-radius:0 2px 2px 0}
+.sb-icon{font-size:13px;width:16px;text-align:center}
+
+/* MAIN */
+.main{flex:1;overflow-y:auto;padding:18px}
+.page{display:none;animation:fadeIn .18s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
+
+/* PAGE HEADER */
+.ph{margin-bottom:18px}
+.ph-title{font-size:18px;font-weight:700;color:var(--text)}
+.ph-sub{font-size:11px;color:var(--text2);margin-top:3px}
+.breadcrumb{font-size:10px;color:var(--text3);margin-bottom:4px;cursor:pointer}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:18px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px}
+.stat-num{font-size:24px;font-weight:800;color:var(--text);line-height:1}
+.stat-num.green{color:var(--green)}
+.stat-num.yellow{color:var(--yellow)}
+.stat-num.red{color:var(--red)}
+.stat-num.accent{color:var(--accent)}
+.stat-num.blue{color:#60a0e0}
+.stat-label{font-size:10px;color:var(--text2);margin-top:3px}
+
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:12px}
+.card-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:11px}
+thead th{text-align:left;padding:6px 10px;color:var(--text3);font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)}
+tbody tr{border-bottom:1px solid rgba(30,58,74,.4);cursor:pointer;transition:background .1s}
+tbody tr:hover{background:var(--surface2)}
+tbody td{padding:7px 10px;color:var(--text);vertical-align:middle}
+tbody tr.xtream-row{border-left:2px solid var(--amber)}
+tbody tr.xtream-row td:first-child{color:var(--amber)}
+tbody tr.temp-row td:nth-child(3){color:#ffaa00}
+
+/* BADGES */
+.b{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:10px;font-size:9px;font-weight:600}
+.b-g{background:rgba(62,186,136,.12);color:var(--green);border:1px solid rgba(62,186,136,.25)}
+.b-y{background:rgba(224,160,64,.12);color:var(--yellow);border:1px solid rgba(224,160,64,.25)}
+.b-r{background:rgba(224,80,80,.12);color:var(--red);border:1px solid rgba(224,80,80,.25)}
+.b-a{background:rgba(78,205,196,.12);color:var(--accent);border:1px solid rgba(78,205,196,.25)}
+.b-gr{background:rgba(74,122,138,.12);color:var(--grey);border:1px solid rgba(74,122,138,.25)}
+.b-bl{background:rgba(96,160,224,.12);color:#60a0e0;border:1px solid rgba(96,160,224,.25)}
+.b-temp{background:rgba(255,170,0,.12);color:#ffaa00;border:1px solid rgba(255,170,0,.25)}
+.b-xt{background:rgba(224,160,64,.12);color:var(--amber);border:1px solid rgba(224,160,64,.25)}
+.b-new{background:rgba(96,160,224,.1);color:#60a0e0;border:1px solid rgba(96,160,224,.2)}
+.dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+
+/* PROGRESS */
+.prog-wrap{background:var(--surface2);border-radius:3px;height:4px;overflow:hidden;min-width:60px}
+.prog-fill{height:100%;border-radius:3px;background:var(--green)}
+
+/* FILTERS */
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.f-input{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:5px 10px;font-size:11px;color:var(--text);outline:none;width:120px}
+.f-input:focus{border-color:var(--accent)}
+.f-select{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:5px 10px;font-size:11px;color:var(--text);outline:none;cursor:pointer}
+.btn{padding:5px 12px;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:5px;transition:opacity .15s}
+.btn:hover{opacity:.82}
+.btn-p{background:linear-gradient(135deg,#1a6a7a,#2a8a9a);color:#fff;border:1px solid #3a9aaa}
+.btn-s{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn-warn{background:rgba(255,170,0,.15);color:#ffaa00;border:1px solid rgba(255,170,0,.3)}
+.btn-sm{padding:3px 8px;font-size:10px}
+.btn-grp{display:flex;gap:6px;margin-left:auto}
+
+/* DEVICE HEADER */
+.dh{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;margin-bottom:12px;display:grid;grid-template-columns:repeat(4,1fr) auto;gap:16px;align-items:center}
+.dh-lbl{font-size:9px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.dh-val{font-size:13px;font-weight:700;color:var(--text)}
+.dh-val.mono{font-family:'Courier New',monospace;font-size:12px}
+.nav-ctrl{display:flex;align-items:center;gap:6px}
+.nav-btn{width:28px;height:28px;border-radius:4px;background:var(--surface2);border:1px solid var(--border);cursor:pointer;color:var(--text2);display:flex;align-items:center;justify-content:center;font-size:12px}
+.nav-pos{font-size:11px;color:var(--text2);white-space:nowrap}
+
+/* TEST GRID */
+.test-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.ts-title{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px}
+.test-row{display:flex;align-items:center;padding:6px 10px;border-bottom:1px solid rgba(30,58,74,.3)}
+.test-row:last-child{border-bottom:none}
+.t-name{flex:1;font-size:11px;color:var(--text)}
+.t-res{min-width:70px}
+.t-per{min-width:60px;font-size:10px;color:var(--text2)}
+.t-date{font-size:10px;color:var(--text3)}
+
+/* BURN WARNING */
+.burn-warn{background:rgba(255,170,0,.08);border:1px solid rgba(255,170,0,.3);border-radius:var(--radius);padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:8px;font-size:11px;color:#ffaa00;font-weight:600}
+
+/* HISTORY */
+.hist-row{display:flex;gap:10px;padding:7px 12px;border-bottom:1px solid rgba(30,58,74,.3);font-size:11px;align-items:flex-start}
+.hist-time{color:var(--text3);min-width:90px;font-size:10px;padding-top:1px}
+.hist-user{color:var(--accent);min-width:55px}
+.hist-field{color:var(--text2);min-width:100px}
+.hist-change{color:var(--text);flex:1}
+
+/* MODAL OVERLAY */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(7,9,13,.75);z-index:200;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--accent);border-radius:8px;padding:18px;width:420px;max-width:95vw}
+.modal-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.modal-title{color:var(--accent);font-size:14px;font-weight:700}
+.modal-close{color:var(--text3);cursor:pointer;font-size:16px;padding:2px 6px}
+.modal-close:hover{color:var(--text)}
+.m-row{margin-bottom:10px}
+.m-lbl{font-size:10px;color:var(--text2);margin-bottom:4px}
+.m-val{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:6px 10px;font-size:11px;color:var(--text);width:100%}
+.m-info{font-size:10px;color:var(--text3);margin-top:6px;line-height:1.5}
+
+/* ANALYTICS */
+.an-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.an-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px}
+.an-title{font-size:11px;font-weight:700;color:var(--accent);margin-bottom:10px}
+.bar-chart{display:flex;gap:6px;align-items:flex-end;height:90px;padding-bottom:4px}
+.bar-wrap{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1}
+.bar{border-radius:3px 3px 0 0;width:100%;transition:opacity .2s;cursor:default}
+.bar:hover{opacity:.8}
+.bar-lbl{font-size:9px;color:var(--text3);text-align:center;white-space:nowrap}
+.bar-val{font-size:9px;color:var(--text2);text-align:center}
+.donut-wrap{display:flex;align-items:center;gap:14px}
+.donut{position:relative;width:80px;height:80px;flex-shrink:0}
+.donut svg{transform:rotate(-90deg)}
+.donut-legend{display:flex;flex-direction:column;gap:4px}
+.dl-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text2)}
+.dl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px;text-align:center}
+.kpi-num{font-size:22px;font-weight:800;color:var(--accent)}
+.kpi-lbl{font-size:10px;color:var(--text2);margin-top:2px}
+.line-chart{position:relative;height:70px;margin-top:4px}
+.line-chart svg{width:100%;height:100%}
+
+/* TWO COL */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* FOOTER */
+.demo-bar{background:rgba(78,205,196,.08);border-top:1px solid rgba(78,205,196,.2);padding:6px 18px;font-size:10px;color:var(--accent);display:flex;align-items:center;gap:6px;flex-shrink:0}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--surface)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* CHECKLIST */
+.ck-row{display:flex;align-items:center;gap:8px;padding:5px 10px;border-bottom:1px solid rgba(30,58,74,.3);font-size:11px}
+.ck-box{width:14px;height:14px;border-radius:3px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0}
+.ck-box.done{background:var(--green);border-color:var(--green);color:#fff}
+.ck-label{flex:1;color:var(--text)}
+.ck-who{font-size:10px;color:var(--text2)}
+
+/* LOGIN */
+.login-wrap{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 44px - 32px)}
+.login-box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:32px;width:340px;text-align:center}
+.login-logo{width:52px;height:52px;background:linear-gradient(135deg,#0d4a5a,#1a8a9a 40%,#4ecdc4);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;color:white;margin:0 auto 14px;box-shadow:0 0 20px rgba(78,205,196,.3)}
+.login-title{font-size:20px;font-weight:800;color:var(--accent);margin-bottom:4px}
+.login-sub{font-size:11px;color:var(--text2);margin-bottom:6px}
+.login-dev{font-size:10px;color:var(--text3);margin-bottom:24px}
+.login-field{background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:9px 12px;font-size:12px;color:var(--text);width:100%;margin-bottom:10px;outline:none}
+.login-field:focus{border-color:var(--accent)}
+.login-btn{width:100%;padding:10px;border-radius:5px;font-size:13px;font-weight:700;cursor:pointer;border:none;background:linear-gradient(135deg,#1a6a7a,#2a8a9a);color:#fff;margin-top:4px;box-shadow:0 0 12px rgba(78,205,196,.2);transition:opacity .15s}
+.login-btn:hover{opacity:.85}
+.login-footer{font-size:10px;color:var(--text3);margin-top:16px}
+</style>
+</head>
+<body>
+
+<!-- LOGIN PAGE (shown first, no topnav) -->
+<div id="login-page" style="background:var(--bg);min-height:100vh;display:flex;flex-direction:column">
+  <div style="padding:10px 16px;font-size:10px;color:var(--text3);border-bottom:1px solid var(--border);background:var(--surface)">belsystem.local</div>
+  <div class="login-wrap">
+    <div class="login-box">
+      <div class="login-logo">BS</div>
+      <div class="login-title">BEL System</div>
+      <div class="login-sub">Engineering Production Platform</div>
+      <div class="login-dev">Developed for AYECKA</div>
+      <input class="login-field" type="text" value="andrei" placeholder="Username">
+      <input class="login-field" type="password" value="••••••••" placeholder="Password">
+      <button class="login-btn" onclick="doLogin()">Sign In →</button>
+      <div class="login-footer">Role-based access · JWT Auth · v1.3</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP (hidden until login) -->
+<div id="main-app" style="display:none;flex-direction:column;flex:1">
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <div class="logo-wrap">
+    <div class="logo-icon">BS</div>
+    <div>
+      <div class="logo-text">BELSYSTEM</div>
+      <div class="logo-sub">for AYECKA</div>
+    </div>
+  </div>
+  <div class="nav-div"></div>
+  <div class="search-bar">🔍 Search serial, order, client, model...</div>
+  <div class="nav-right">
+    <div class="nav-icon">🔔</div>
+    <div class="nav-icon">⚙</div>
+    <div class="avatar">AK</div>
+    <div class="dev-tag">Developed for AYECKA</div>
+  </div>
+</nav>
+
+<div class="layout">
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sb-sec">Main</div>
+  <div class="sb-item active" onclick="showPage('home',this)"><span class="sb-icon">🏠</span>Home</div>
+  <div class="sb-item" onclick="showPage('units',this)"><span class="sb-icon">📋</span>Unit Selector</div>
+  <div class="sb-item" onclick="showPage('orders',this)"><span class="sb-icon">📦</span>Orders</div>
+  <div class="sb-sec">Service</div>
+  <div class="sb-item" onclick="showPage('rma',this)"><span class="sb-icon">🔧</span>RMA / RMI</div>
+  <div class="sb-sec">System</div>
+  <div class="sb-item" onclick="showPage('admin',this)"><span class="sb-icon">🛡</span>Admin Panel</div>
+  <div class="sb-sec">External</div>
+  <div class="sb-item" onclick="showPage('analytics',this)"><span class="sb-icon">📊</span>Analytics ↗</div>
+</aside>
+
+<main class="main">
+
+<!-- ══════════════ HOME ══════════════ -->
+<div id="page-home" class="page active">
+  <div class="ph">
+    <div class="ph-title">Home Dashboard</div>
+    <div class="ph-sub">Production overview — June 29, 2026</div>
+  </div>
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-num">339</div><div class="stat-label">Total Units</div></div>
+    <div class="stat-card"><div class="stat-num blue">23</div><div class="stat-label">NEW</div></div>
+    <div class="stat-card"><div class="stat-num yellow">67</div><div class="stat-label">IN PROGRESS</div></div>
+    <div class="stat-card"><div class="stat-num green">241</div><div class="stat-label">READY</div></div>
+    <div class="stat-card"><div class="stat-num red">8</div><div class="stat-label">HOLD</div></div>
+  </div>
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">Active Orders</div>
+      <table>
+        <thead><tr><th>Order</th><th>Client</th><th>Qty</th><th>Progress</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr onclick="showPage('orders',document.querySelector('[onclick*=orders]'))">
+            <td><b>SO25000172</b></td><td style="font-size:10px">SOUTHEASTASIANET</td><td>8</td>
+            <td><div class="prog-wrap"><div class="prog-fill" style="width:62%;background:var(--yellow)"></div></div></td>
+            <td><span class="b b-y"><span class="dot"></span>IN PROGRESS</span></td>
+          </tr>
+          <tr onclick="showPage('orders',document.querySelector('[onclick*=orders]'))">
+            <td><b>SO25000156</b></td><td style="font-size:10px">LINK-COM TELECOM</td><td>5</td>
+            <td><div class="prog-wrap"><div class="prog-fill" style="width:100%"></div></div></td>
+            <td><span class="b b-g"><span class="dot"></span>READY</span></td>
+          </tr>
+          <tr>
+            <td><b>SO25000180</b></td><td style="font-size:10px">VIASAT ISRAEL</td><td>12</td>
+            <td><div class="prog-wrap"><div class="prog-fill" style="width:25%;background:#60a0e0"></div></div></td>
+            <td><span class="b b-bl"><span class="dot"></span>OPEN</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-title">Stock Units (no order)</div>
+      <table>
+        <thead><tr><th>Model</th><th>NEW</th><th>IN PROG</th><th>READY</th><th>HOLD</th></tr></thead>
+        <tbody>
+          <tr><td>NS3000</td><td><span class="b b-bl">6</span></td><td><span class="b b-y">6</span></td><td><span class="b b-g">18</span></td><td><span class="b b-r">1</span></td></tr>
+          <tr><td>NS1000</td><td><span class="b b-bl">8</span></td><td><span class="b b-y">9</span></td><td><span class="b b-g">24</span></td><td><span class="b b-r">3</span></td></tr>
+          <tr><td>NS21</td><td><span class="b b-bl">4</span></td><td><span class="b b-y">2</span></td><td><span class="b b-g">5</span></td><td></td></tr>
+          <tr><td>NS10</td><td><span class="b b-bl">3</span></td><td><span class="b b-y">4</span></td><td><span class="b b-g">7</span></td><td><span class="b b-r">2</span></td></tr>
+          <tr><td>Xtream</td><td><span class="b b-bl">2</span></td><td><span class="b b-y">3</span></td><td><span class="b b-g">4</span></td><td></td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:8px;font-size:10px;color:var(--yellow)">⚠ 12 TEMP units pending real serial</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ UNIT SELECTOR ══════════════ -->
+<div id="page-units" class="page">
+  <div class="ph">
+    <div class="breadcrumb" onclick="showPage('home',document.querySelector('[onclick*=home]'))">🏠 Home › Unit Selector</div>
+    <div class="ph-title">Unit Selector</div>
+    <div class="ph-sub">339 units total · 12 TEMP · Xtream highlighted in amber</div>
+  </div>
+  <div class="filter-row">
+    <input class="f-input" placeholder="Serial...">
+    <input class="f-input" placeholder="Order...">
+    <input class="f-input" placeholder="Client...">
+    <select class="f-select">
+      <option>All Models</option><option>NS1000</option><option>NS3000</option><option>NS10</option><option>NS21</option><option>NS2000</option><option>Xtream</option>
+    </select>
+    <select class="f-select">
+      <option>All Status</option><option>NEW</option><option>IN PROGRESS</option><option>READY</option><option>HOLD</option>
+    </select>
+    <select class="f-select">
+      <option>All units</option><option>TEMP only</option><option>Xtream only</option>
+    </select>
+    <button class="btn btn-s btn-sm">↺ Reset</button>
+    <div class="btn-grp">
+      <button class="btn btn-p btn-sm">+ Add Unit</button>
+      <button class="btn btn-warn btn-sm" onclick="openModal('modal-temp')">⚠ Batch TEMP</button>
+      <button class="btn btn-s btn-sm" onclick="openModal('modal-batch')">🔄 Batch Update</button>
+      <button class="btn btn-s btn-sm">⬇ Export</button>
+    </div>
+  </div>
+  <div class="card" style="padding:0">
+    <table>
+      <thead><tr>
+        <th style="width:28px"><input type="checkbox"></th>
+        <th>Serial Number</th><th>Model</th><th>Type</th><th>Burn-In</th><th>ATE</th><th>CAL</th><th>Order</th><th>Global Status</th>
+      </tr></thead>
+      <tbody>
+        <tr onclick="showDevice('3007240066')">
+          <td><input type="checkbox" checked onclick="e=>e.stopPropagation()"></td>
+          <td style="color:var(--accent);font-weight:600">3007240066</td>
+          <td>NS3000</td><td><span class="b b-gr">Used</span></td>
+          <td><span class="b b-g">PASS</span></td><td><span class="b b-g">PASS</span></td><td><span class="b b-g">PASS</span></td>
+          <td style="font-size:10px">SO25000172</td>
+          <td><span class="b b-g"><span class="dot"></span>READY</span></td>
+        </tr>
+        <tr class="temp-row" onclick="showDevice('TEMP-20260624-01')">
+          <td><input type="checkbox" onclick="e=>e.stopPropagation()"></td>
+          <td>⚠ TEMP-20260624-01</td>
+          <td>NS1000</td><td><span class="b b-bl">New</span></td>
+          <td><span class="b b-y">IN PROG</span></td><td><span class="b b-gr">—</span></td><td><span class="b b-gr">—</span></td>
+          <td style="color:var(--text3)">—</td>
+          <td><span class="b b-new"><span class="dot"></span>NEW</span></td>
+        </tr>
+        <tr class="temp-row" onclick="showDevice('TEMP-20260624-02')">
+          <td><input type="checkbox" onclick="e=>e.stopPropagation()"></td>
+          <td>⚠ TEMP-20260624-02</td>
+          <td>NS1000</td><td><span class="b b-bl">New</span></td>
+          <td><span class="b b-gr">—</span></td><td><span class="b b-gr">—</span></td><td><span class="b b-gr">—</span></td>
+          <td style="color:var(--text3)">—</td>
+          <td><span class="b b-new"><span class="dot"></span>NEW</span></td>
+        </tr>
+        <tr onclick="showDevice('2517240046')">
+          <td><input type="checkbox" checked onclick="e=>e.stopPropagation()"></td>
+          <td style="color:var(--accent);font-weight:600">2517240046</td>
+          <td>NS21</td><td><span class="b b-bl">New</span></td>
+          <td><span class="b b-g">PASS</span></td><td><span class="b b-g">PASS</span></td><td><span class="b b-gr">N/REQ</span></td>
+          <td style="font-size:10px">SO25000172</td>
+          <td><span class="b b-y"><span class="dot"></span>IN PROGRESS</span></td>
+        </tr>
+        <tr class="xtream-row" onclick="showDevice('XT-001')">
+          <td><input type="checkbox" onclick="e=>e.stopPropagation()"></td>
+          <td>🖥 XT-001</td>
+          <td><span class="b b-xt">Xtream</span></td><td><span class="b b-bl">New</span></td>
+          <td><span class="b b-gr">N/A</span></td><td><span class="b b-gr">N/A</span></td><td><span class="b b-gr">N/A</span></td>
+          <td style="font-size:10px">SO25000172</td>
+          <td><span class="b b-y"><span class="dot"></span>IN PROGRESS</span></td>
+        </tr>
+        <tr onclick="showDevice('3049230032')">
+          <td><input type="checkbox" onclick="e=>e.stopPropagation()"></td>
+          <td style="color:var(--accent);font-weight:600">3049230032</td>
+          <td>NS3000</td><td><span class="b b-gr">Used</span></td>
+          <td><span class="b b-g">PASS</span></td><td><span class="b b-g">PASS</span></td><td><span class="b b-g">PASS</span></td>
+          <td style="font-size:10px">SO25000172</td>
+          <td><span class="b b-g"><span class="dot"></span>READY</span></td>
+        </tr>
+        <tr>
+          <td><input type="checkbox" onclick="e=>e.stopPropagation()"></td>
+          <td style="color:var(--red);font-weight:600">1546250033</td>
+          <td>NS10</td><td><span class="b b-bl">New</span></td>
+          <td><span class="b b-r">FAILED</span></td><td><span class="b b-gr">—</span></td><td><span class="b b-gr">—</span></td>
+          <td style="color:var(--text3)">—</td>
+          <td><span class="b b-r"><span class="dot"></span>HOLD</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="padding:8px 12px;font-size:10px;color:var(--text3);border-top:1px solid var(--border);display:flex;gap:16px">
+      <span>Total: <b style="color:var(--text)">339</b></span>
+      <span>Selected: <b style="color:var(--accent)">2</b></span>
+      <span>NEW: <b style="color:#60a0e0">23</b></span>
+      <span>READY: <b style="color:var(--green)">241</b></span>
+      <span>⚠ TEMP: <b style="color:#ffaa00">12</b></span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ DEVICE — NORMAL ══════════════ -->
+<div id="page-device-normal" class="page">
+  <div class="ph">
+    <div class="breadcrumb" onclick="showPage('units',document.querySelector('[onclick*=units]'))">🏠 Home › Unit Selector › Device Dashboard</div>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
+      <div class="ph-title">Device Dashboard — NS3000 / SN: 3007240066</div>
+      <span class="b b-g" style="font-size:11px">● READY</span>
+    </div>
+  </div>
+  <div class="dh">
+    <div><div class="dh-lbl">Serial Number</div><div class="dh-val mono">3007240066 📋</div></div>
+    <div><div class="dh-lbl">Model</div><div class="dh-val">NS3000 Modem</div></div>
+    <div><div class="dh-lbl">Order</div><div class="dh-val">SO25000172 📋</div></div>
+    <div><div class="dh-lbl">Client</div><div class="dh-val" style="font-size:11px">SOUTHEASTASIANET Myanmar</div></div>
+    <div class="nav-ctrl">
+      <button class="nav-btn">◀</button>
+      <div class="nav-pos">12 / 339</div>
+      <button class="nav-btn">▶</button>
+    </div>
+  </div>
+  <div class="test-grid">
+    <div class="card">
+      <div class="ts-title">Production Tests</div>
+      <div class="test-row"><div class="t-name">Software Version</div><div class="t-res"><span class="b b-g">PASS</span></div><div class="t-per">Alex K.</div><div class="t-date">27/05/26</div></div>
+      <div class="test-row"><div class="t-name">Power Calibration</div><div class="t-res"><span class="b b-g">PASS</span></div><div class="t-per">Alex K.</div><div class="t-date">27/05/26</div></div>
+      <div class="test-row"><div class="t-name">IQ Calibration</div><div class="t-res"><span class="b b-g">PASS</span></div><div class="t-per">Alex K.</div><div class="t-date">27/05/26</div></div>
+      <div class="test-row"><div class="t-name">ATE Test</div><div class="t-res"><span class="b b-g">PASS</span></div><div class="t-per">Alex K.</div><div class="t-date">26/05/26</div></div>
+      <div class="test-row"><div class="t-name">Burn-In</div><div class="t-res"><span class="b b-g">PASS</span></div><div class="t-per">Alex K.</div><div class="t-date">25/05/26</div></div>
+    </div>
+    <div class="card">
+      <div class="ts-title">Validation Tests</div>
+      <div class="test-row"><div class="t-name">License</div><div class="t-res"><span class="b b-g">PASS</span></div><div class="t-per">Alex K.</div><div class="t-date">27/05/26</div></div>
+      <div class="test-row"><div class="t-name">Database</div><div class="t-res"><span class="b b-g">PASS</span></div><div class="t-per">Alex K.</div><div class="t-date">27/05/26</div></div>
+      <div class="test-row"><div class="t-name">Alarm</div><div class="t-res"><span class="b b-g">PASS</span></div><div class="t-per">Alex K.</div><div class="t-date">27/05/26</div></div>
+      <div class="test-row"><div class="t-name">Events</div><div class="t-res"><span class="b b-g">PASS</span></div><div class="t-per">Alex K.</div><div class="t-date">27/05/26</div></div>
+      <div class="test-row"><div class="t-name">Challenge</div><div class="t-res"><span class="b b-gr">—</span></div><div class="t-per">—</div><div class="t-date">—</div></div>
+      <div class="test-row"><div class="t-name">TSOIP</div><div class="t-res"><span class="b b-g">PASS</span></div><div class="t-per">Alex K.</div><div class="t-date">27/05/26</div></div>
+    </div>
+  </div>
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">Final QA Checklist</div>
+      <div class="ck-row"><div class="ck-box done">✓</div><div class="ck-label">Device Assembled</div><div class="ck-who">Alex K. · 27/05/26</div></div>
+      <div class="ck-row"><div class="ck-box done">✓</div><div class="ck-label">Cover Screwed</div><div class="ck-who">Alex K.</div></div>
+      <div class="ck-row"><div class="ck-box done">✓</div><div class="ck-label">Sticker Applied</div><div class="ck-who">Alex K.</div></div>
+      <div class="ck-row"><div class="ck-box"></div><div class="ck-label">Double Check</div><div class="ck-who">—</div></div>
+      <div class="ck-row"><div class="ck-box"></div><div class="ck-label">Passed to Packaging</div><div class="ck-who">—</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🕐 Change History <span style="font-size:10px;color:var(--text3);font-weight:400">(latest)</span></div>
+      <div class="hist-row"><div class="hist-time">27/05/26 14:32</div><div class="hist-user">Alex K.</div><div class="hist-field">TSOIP</div><div class="hist-change">— → <span class="b b-g">PASS</span></div></div>
+      <div class="hist-row"><div class="hist-time">27/05/26 11:15</div><div class="hist-user">Alex K.</div><div class="hist-field">License</div><div class="hist-change">— → <span class="b b-g">PASS</span></div></div>
+      <div class="hist-row"><div class="hist-time">26/05/26 16:02</div><div class="hist-user">Alex K.</div><div class="hist-field">ATE Test</div><div class="hist-change">IN PROGRESS → <span class="b b-g">PASS</span></div></div>
+      <div class="hist-row"><div class="hist-time">25/05/26 09:10</div><div class="hist-user">Andrei</div><div class="hist-field">Burn-In</div><div class="hist-change">— → <span class="b b-g">PASS</span></div></div>
+      <div class="hist-row"><div class="hist-time">24/05/26 08:45</div><div class="hist-user">System</div><div class="hist-field">Global Status</div><div class="hist-change">NEW → IN PROGRESS</div></div>
+      <div style="padding:6px 12px"><button class="btn btn-s btn-sm" onclick="showPage('history',null)">View full history →</button></div>
+    </div>
+  </div>
+  <div style="display:flex;gap:6px;margin-top:4px">
+    <button class="btn btn-p btn-sm">💾 Save</button>
+    <button class="btn btn-s btn-sm">📎 Attachments (3)</button>
+    <button class="btn btn-s btn-sm">⬇ Export</button>
+    <button class="btn btn-s btn-sm" onclick="showPage('units',document.querySelector('[onclick*=units]'))">← Back</button>
+  </div>
+</div>
+
+<!-- ══════════════ DEVICE — TEMP ══════════════ -->
+<div id="page-device-temp" class="page">
+  <div class="ph">
+    <div class="breadcrumb" onclick="showPage('units',document.querySelector('[onclick*=units]'))">🏠 Home › Unit Selector › Device Dashboard</div>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:4px;flex-wrap:wrap">
+      <div class="ph-title">Device Dashboard — ⚠ TEMP-20260624-01</div>
+      <span class="b b-new" style="font-size:11px">● NEW</span>
+    </div>
+  </div>
+  <div class="burn-warn">⚠ BURN-IN NOT PASSED — all tests locked. Only Burning Status can be edited until Burn-In = PASS or NOT REQ.</div>
+  <div class="dh" style="grid-template-columns:repeat(3,1fr) auto">
+    <div><div class="dh-lbl">Serial Number</div><div class="dh-val mono" style="color:#ffaa00">⚠ TEMP-20260624-01</div></div>
+    <div><div class="dh-lbl">Model</div><div class="dh-val">NS1000</div></div>
+    <div><div class="dh-lbl">Order</div><div class="dh-val" style="color:var(--text3);font-size:11px">N/A — real serial required 🔒</div></div>
+    <div class="nav-ctrl"><button class="nav-btn">◀</button><div class="nav-pos">2 / 339</div><button class="nav-btn">▶</button></div>
+  </div>
+  <div class="test-grid">
+    <div class="card">
+      <div class="ts-title">Production Tests</div>
+      <div class="test-row" style="opacity:.3"><div class="t-name">Software Version</div><div class="t-res">🔒</div></div>
+      <div class="test-row" style="opacity:.3"><div class="t-name">Power Calibration</div><div class="t-res">🔒</div></div>
+      <div class="test-row" style="opacity:.3"><div class="t-name">IQ Calibration</div><div class="t-res">🔒</div></div>
+      <div class="test-row" style="opacity:.3"><div class="t-name">ATE Test</div><div class="t-res">🔒</div></div>
+      <div class="test-row" style="background:rgba(78,205,196,.05);border-radius:4px">
+        <div class="t-name"><b>Burn-In</b> ✏</div>
+        <div class="t-res"><span class="b b-y">IN PROG</span></div>
+        <div class="t-per">Andrei</div><div class="t-date">Today</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ts-title">Validation Tests — 🔒 Locked</div>
+      <div style="opacity:.3">
+        <div class="test-row"><div class="t-name">License</div><div class="t-res">🔒</div></div>
+        <div class="test-row"><div class="t-name">Database</div><div class="t-res">🔒</div></div>
+        <div class="test-row"><div class="t-name">Alarm</div><div class="t-res">🔒</div></div>
+        <div class="test-row"><div class="t-name">Events</div><div class="t-res">🔒</div></div>
+        <div class="test-row"><div class="t-name">TSOIP</div><div class="t-res">🔒</div></div>
+      </div>
+    </div>
+  </div>
+  <button class="btn btn-s btn-sm" onclick="showPage('units',document.querySelector('[onclick*=units]'))">← Back</button>
+</div>
+
+<!-- ══════════════ DEVICE — XTREAM ══════════════ -->
+<div id="page-device-xtream" class="page">
+  <div class="ph">
+    <div class="breadcrumb" onclick="showPage('units',document.querySelector('[onclick*=units]'))">🏠 Home › Unit Selector › Xtream Dashboard</div>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
+      <div class="ph-title">🖥 Xtream Dashboard — XT-001</div>
+      <span class="b b-y" style="font-size:11px">● IN PROGRESS</span>
+    </div>
+  </div>
+  <div class="dh" style="grid-template-columns:repeat(3,1fr) auto">
+    <div><div class="dh-lbl">Serial Number</div><div class="dh-val mono" style="color:var(--amber)">XT-001</div></div>
+    <div><div class="dh-lbl">Model</div><div class="dh-val">Xtream Server</div></div>
+    <div><div class="dh-lbl">Order</div><div class="dh-val">SO25000172</div></div>
+    <div class="nav-ctrl"><button class="nav-btn">◀</button><div class="nav-pos">5 / 339</div><button class="nav-btn">▶</button></div>
+  </div>
+  <div class="card" style="margin-bottom:12px">
+    <div class="card-title">Production Flow</div>
+    <div style="display:flex;align-items:center;gap:0;flex-wrap:wrap">
+      <div style="padding:5px 14px;background:rgba(62,186,136,.15);border:1px solid var(--green);border-radius:4px 0 0 4px;font-size:10px;color:var(--green)">✓ Assembly</div>
+      <div style="padding:5px 14px;background:rgba(62,186,136,.15);border:1px solid var(--green);border-left:none;font-size:10px;color:var(--green)">✓ Setup & Sync</div>
+      <div style="padding:5px 14px;background:rgba(78,205,196,.15);border:1px solid var(--accent);border-left:none;font-size:10px;color:var(--accent);font-weight:600">● Extreme Test</div>
+      <div style="padding:5px 14px;background:var(--surface2);border:1px solid var(--border);border-left:none;font-size:10px;color:var(--text3)">Marking</div>
+      <div style="padding:5px 14px;background:var(--surface2);border:1px solid var(--border);border-left:none;border-radius:0 4px 4px 0;font-size:10px;color:var(--text3)">Packaging</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Installed Cards</div>
+    <table>
+      <thead><tr><th>Serial</th><th>Model</th><th>Sync</th><th>Extreme Test</th><th>Comment</th></tr></thead>
+      <tbody>
+        <tr><td>2517240046</td><td>NS21</td><td><span class="b b-g">✓ Synced</span></td><td><span class="b b-g">PASS</span></td><td>—</td></tr>
+        <tr><td>1546250033</td><td>NS10</td><td><span class="b b-g">✓ Synced</span></td><td><span class="b b-y">In Progress</span></td><td>—</td></tr>
+        <tr><td>2517240071</td><td>NS21</td><td><span class="b b-r">✗ FAIL</span></td><td><span class="b b-gr">—</span></td><td style="font-size:10px;color:var(--red)">Did not sync</td></tr>
+      </tbody>
+    </table>
+    <div style="margin-top:8px;display:flex;gap:6px">
+      <button class="btn btn-s btn-sm">🔁 Replace Card</button>
+      <button class="btn btn-p btn-sm">💾 Save</button>
+      <button class="btn btn-s btn-sm" onclick="showPage('units',document.querySelector('[onclick*=units]'))">← Back</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ HISTORY ══════════════ -->
+<div id="page-history" class="page">
+  <div class="ph">
+    <div class="breadcrumb" onclick="showPage('device-normal',null)">🏠 Home › Unit Selector › Device Dashboard › History</div>
+    <div class="ph-title">Change History — SN: 3007240066</div>
+    <div class="ph-sub">Complete audit log · all changes recorded automatically</div>
+  </div>
+  <div class="card" style="padding:0">
+    <div class="hist-row" style="background:var(--surface2);font-weight:700;font-size:10px;color:var(--text3)">
+      <div class="hist-time">Date / Time</div><div class="hist-user">User</div><div class="hist-field">Field</div><div class="hist-change">Change</div>
+    </div>
+    <div class="hist-row"><div class="hist-time">27/05/26 14:32</div><div class="hist-user">Alex K.</div><div class="hist-field">TSOIP</div><div class="hist-change">— → <span class="b b-g">PASS</span></div></div>
+    <div class="hist-row"><div class="hist-time">27/05/26 13:55</div><div class="hist-user">Alex K.</div><div class="hist-field">Events</div><div class="hist-change">— → <span class="b b-g">PASS</span></div></div>
+    <div class="hist-row"><div class="hist-time">27/05/26 13:10</div><div class="hist-user">Alex K.</div><div class="hist-field">Alarm</div><div class="hist-change">— → <span class="b b-g">PASS</span></div></div>
+    <div class="hist-row"><div class="hist-time">27/05/26 12:30</div><div class="hist-user">Alex K.</div><div class="hist-field">Database</div><div class="hist-change">— → <span class="b b-g">PASS</span></div></div>
+    <div class="hist-row"><div class="hist-time">27/05/26 11:15</div><div class="hist-user">Alex K.</div><div class="hist-field">License</div><div class="hist-change">— → <span class="b b-g">PASS</span></div></div>
+    <div class="hist-row"><div class="hist-time">27/05/26 09:45</div><div class="hist-user">Alex K.</div><div class="hist-field">Global Status</div><div class="hist-change">IN PROGRESS → <span class="b b-g">READY</span></div></div>
+    <div class="hist-row"><div class="hist-time">26/05/26 16:02</div><div class="hist-user">Alex K.</div><div class="hist-field">ATE Test</div><div class="hist-change">IN PROGRESS → <span class="b b-g">PASS</span></div></div>
+    <div class="hist-row"><div class="hist-time">26/05/26 09:00</div><div class="hist-user">Oded</div><div class="hist-field">ATE Test</div><div class="hist-change">— → IN PROGRESS</div></div>
+    <div class="hist-row"><div class="hist-time">25/05/26 15:30</div><div class="hist-user">Alex K.</div><div class="hist-field">SW Version</div><div class="hist-change">— → <span class="b b-g">PASS</span></div></div>
+    <div class="hist-row"><div class="hist-time">25/05/26 09:10</div><div class="hist-user">Andrei</div><div class="hist-field">Burn-In</div><div class="hist-change">— → <span class="b b-g">PASS</span></div></div>
+    <div class="hist-row"><div class="hist-time">24/05/26 08:45</div><div class="hist-user">System</div><div class="hist-field">Global Status</div><div class="hist-change">NEW → IN PROGRESS</div></div>
+    <div class="hist-row"><div class="hist-time">23/05/26 11:00</div><div class="hist-user">System</div><div class="hist-field">Unit Created</div><div class="hist-change">Serial: 3007240066 · Model: NS3000 · Status: <span class="b b-new">NEW</span></div></div>
+  </div>
+  <button class="btn btn-s btn-sm" style="margin-top:8px" onclick="showPage('device-normal',null)">← Back to Device</button>
+</div>
+
+<!-- ══════════════ ORDERS ══════════════ -->
+<div id="page-orders" class="page">
+  <div class="ph">
+    <div class="breadcrumb">🏠 Home › Orders</div>
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div class="ph-title">Orders</div>
+      <button class="btn btn-p btn-sm">+ New Order</button>
+    </div>
+  </div>
+  <div class="stats-row" style="grid-template-columns:repeat(3,1fr)">
+    <div class="stat-card"><div class="stat-num yellow">3</div><div class="stat-label">Active Orders</div></div>
+    <div class="stat-card"><div class="stat-num green">12</div><div class="stat-label">Completed</div></div>
+    <div class="stat-card"><div class="stat-num accent">25</div><div class="stat-label">Units Reserved</div></div>
+  </div>
+  <div class="card" style="padding:0">
+    <table>
+      <thead><tr><th>Order #</th><th>Client</th><th>Model</th><th>Qty</th><th>Ready</th><th>Due</th><th>Status</th><th>Priority</th></tr></thead>
+      <tbody>
+        <tr onclick="showOrder('SO25000172')" style="cursor:pointer">
+          <td><b style="color:var(--accent)">SO25000172</b></td>
+          <td style="font-size:10px">SOUTHEASTASIANET Myanmar</td>
+          <td>NS3000</td><td>8</td><td>5</td>
+          <td style="font-size:10px">15/07/26</td>
+          <td><span class="b b-y">IN PROGRESS</span></td>
+          <td><span class="b b-r">HIGH</span></td>
+        </tr>
+        <tr onclick="showOrder('SO25000156')" style="cursor:pointer">
+          <td><b style="color:var(--accent)">SO25000156</b></td>
+          <td style="font-size:10px">LINK-COM TELECOM LTD</td>
+          <td>NS1000</td><td>5</td><td>5</td>
+          <td style="font-size:10px">01/07/26</td>
+          <td><span class="b b-g">READY</span></td>
+          <td><span class="b b-y">MED</span></td>
+        </tr>
+        <tr onclick="showOrder('SO25000180')" style="cursor:pointer">
+          <td><b style="color:var(--accent)">SO25000180</b></td>
+          <td style="font-size:10px">VIASAT ISRAEL LTD</td>
+          <td>NS1000</td><td>12</td><td>3</td>
+          <td style="font-size:10px">30/08/26</td>
+          <td><span class="b b-bl">OPEN</span></td>
+          <td><span class="b b-gr">LOW</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="padding:7px 12px;font-size:10px;color:var(--text3);border-top:1px solid var(--border)">
+      Click on any order to see its units
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ ORDER DETAIL ══════════════ -->
+<div id="page-order-detail" class="page">
+  <div class="ph">
+    <div class="breadcrumb" onclick="showPage('orders',document.querySelector('[onclick*=orders]'))" style="cursor:pointer">🏠 Home › Orders › Order Detail</div>
+    <div style="display:flex;align-items:center;gap:12px;margin-top:4px;flex-wrap:wrap">
+      <div class="ph-title" id="od-title">Order SO25000172</div>
+      <span id="od-status-badge"></span>
+    </div>
+  </div>
+
+  <!-- Order header info -->
+  <div class="dh" style="grid-template-columns:repeat(4,1fr);margin-bottom:14px" id="od-header">
+    <div><div class="dh-lbl">Client</div><div class="dh-val" id="od-client" style="font-size:12px"></div></div>
+    <div><div class="dh-lbl">Model</div><div class="dh-val" id="od-model"></div></div>
+    <div><div class="dh-lbl">Due Date</div><div class="dh-val" id="od-due"></div></div>
+    <div><div class="dh-lbl">Priority</div><div class="dh-val" id="od-priority"></div></div>
+  </div>
+
+  <!-- Progress summary -->
+  <div class="stats-row" style="grid-template-columns:repeat(4,1fr);margin-bottom:14px" id="od-stats"></div>
+
+  <!-- Units table -->
+  <div class="card" style="padding:0">
+    <div style="padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+      <div style="font-size:12px;font-weight:700;color:var(--text)">Units in this order</div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-s btn-sm">⬇ Export</button>
+        <button class="btn btn-s btn-sm" onclick="showPage('orders',document.querySelector('[onclick*=orders]'))">← Back to Orders</button>
+      </div>
+    </div>
+    <table>
+      <thead><tr>
+        <th>Serial Number</th><th>Model</th><th>Type</th>
+        <th>Burn-In</th><th>ATE</th><th>CAL</th>
+        <th>SW</th><th>Global Status</th><th></th>
+      </tr></thead>
+      <tbody id="od-units-body"></tbody>
+    </table>
+    <div style="padding:8px 12px;font-size:10px;color:var(--text3);border-top:1px solid var(--border)" id="od-footer"></div>
+  </div>
+</div>
+
+<!-- ══════════════ RMA ══════════════ -->
+<div id="page-rma" class="page">
+  <div class="ph">
+    <div class="breadcrumb">🏠 Home › RMA / RMI</div>
+    <div class="ph-title">RMA / RMI</div>
+    <div class="ph-sub">Returned unit management · separate database · own workflow</div>
+  </div>
+  <div class="card" style="padding:0">
+    <table>
+      <thead><tr><th>RMA #</th><th>Serial</th><th>Model</th><th>Client</th><th>Problem</th><th>Stage</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td><b>RMA-2026-041</b></td><td>3049220011</td><td>NS1000</td><td style="font-size:10px">VIASAT ISRAEL</td><td style="font-size:10px">No TX signal</td><td style="font-size:10px">ATE Test</td><td><span class="b b-y">IN PROGRESS</span></td></tr>
+        <tr><td><b>RMA-2026-039</b></td><td>2517230082</td><td>NS21</td><td style="font-size:10px">LINK-COM</td><td style="font-size:10px">Sync failure</td><td style="font-size:10px">Repair</td><td><span class="b b-y">IN PROGRESS</span></td></tr>
+        <tr><td><b>RMA-2026-035</b></td><td>1546240055</td><td>NS10</td><td style="font-size:10px">SOUTHEASTASIANET</td><td style="font-size:10px">Power fault</td><td style="font-size:10px">Packaging</td><td><span class="b b-g">READY</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════ ADMIN ══════════════ -->
+<div id="page-admin" class="page">
+  <div class="ph"><div class="ph-title">Admin Panel</div><div class="ph-sub">Users · Roles · SW versions · Models · Flow steps</div></div>
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">👥 Users & Roles</div>
+      <table>
+        <thead><tr><th>Name</th><th>Role</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Andrei</td><td><span class="b b-a">Admin</span></td><td><span class="b b-g">Active</span></td></tr>
+          <tr><td>Oded</td><td><span class="b b-gr">Engineer</span></td><td><span class="b b-g">Active</span></td></tr>
+          <tr><td>Dov</td><td><span class="b b-gr">Engineer</span></td><td><span class="b b-g">Active</span></td></tr>
+          <tr><td>Avi</td><td><span class="b b-gr">Engineer</span></td><td><span class="b b-g">Active</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-title">⚙ System Config</div>
+      <table>
+        <thead><tr><th>Parameter</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td style="font-size:10px">NS1000 SW Version</td><td style="font-family:monospace;font-size:10px">NS1000.7.4.0.125915</td></tr>
+          <tr><td style="font-size:10px">Auth</td><td><span class="b b-g">JWT · Role-based</span></td></tr>
+          <tr><td style="font-size:10px">Notifications</td><td><span class="b b-a">Email + Telegram</span></td></tr>
+          <tr><td style="font-size:10px">Deployment</td><td><span class="b b-bl">LAN · Internet-ready</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ ANALYTICS ══════════════ -->
+<div id="page-analytics" class="page">
+  <div class="ph">
+    <div class="ph-title">Analytics Dashboard ↗</div>
+    <div class="ph-sub">Production metrics · updated in real time · external module</div>
+  </div>
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-num">339</div><div class="kpi-lbl">Total Units</div></div>
+    <div class="kpi"><div class="kpi-num" style="color:var(--green)">71%</div><div class="kpi-lbl">READY rate</div></div>
+    <div class="kpi"><div class="kpi-num" style="color:var(--yellow)">4.2d</div><div class="kpi-lbl">Avg. cycle time</div></div>
+    <div class="kpi"><div class="kpi-num" style="color:var(--red)">2.4%</div><div class="kpi-lbl">HOLD rate</div></div>
+  </div>
+  <div class="an-grid">
+    <div class="an-card">
+      <div class="an-title">Units by Status</div>
+      <div class="donut-wrap">
+        <div class="donut">
+          <svg viewBox="0 0 36 36" width="80" height="80">
+            <circle cx="18" cy="18" r="14" fill="none" stroke="#1e3a4a" stroke-width="4"/>
+            <circle cx="18" cy="18" r="14" fill="none" stroke="#3eba88" stroke-width="4" stroke-dasharray="71 29" stroke-dashoffset="0"/>
+            <circle cx="18" cy="18" r="14" fill="none" stroke="#e0a040" stroke-width="4" stroke-dasharray="20 80" stroke-dashoffset="-71"/>
+            <circle cx="18" cy="18" r="14" fill="none" stroke="#60a0e0" stroke-width="4" stroke-dasharray="7 93" stroke-dashoffset="-91"/>
+            <circle cx="18" cy="18" r="14" fill="none" stroke="#e05050" stroke-width="4" stroke-dasharray="2 98" stroke-dashoffset="-98"/>
+          </svg>
+        </div>
+        <div class="donut-legend">
+          <div class="dl-item"><div class="dl-dot" style="background:var(--green)"></div>READY — 241 (71%)</div>
+          <div class="dl-item"><div class="dl-dot" style="background:var(--yellow)"></div>IN PROGRESS — 67 (20%)</div>
+          <div class="dl-item"><div class="dl-dot" style="background:#60a0e0"></div>NEW — 23 (7%)</div>
+          <div class="dl-item"><div class="dl-dot" style="background:var(--red)"></div>HOLD — 8 (2%)</div>
+        </div>
+      </div>
+    </div>
+    <div class="an-card">
+      <div class="an-title">Units by Model</div>
+      <div class="bar-chart">
+        <div class="bar-wrap"><div class="bar-val">112</div><div class="bar" style="height:90px;background:#4ecdc4"></div><div class="bar-lbl">NS1000</div></div>
+        <div class="bar-wrap"><div class="bar-val">87</div><div class="bar" style="height:70px;background:#4ecdc4"></div><div class="bar-lbl">NS3000</div></div>
+        <div class="bar-wrap"><div class="bar-val">54</div><div class="bar" style="height:43px;background:#6C63FF"></div><div class="bar-lbl">NS2000</div></div>
+        <div class="bar-wrap"><div class="bar-val">42</div><div class="bar" style="height:34px;background:#e0a040"></div><div class="bar-lbl">NS21</div></div>
+        <div class="bar-wrap"><div class="bar-val">28</div><div class="bar" style="height:22px;background:#e0a040"></div><div class="bar-lbl">NS10</div></div>
+        <div class="bar-wrap"><div class="bar-val">16</div><div class="bar" style="height:13px;background:#3eba88"></div><div class="bar-lbl">Xtream</div></div>
+      </div>
+    </div>
+    <div class="an-card">
+      <div class="an-title">Units READY — last 6 months</div>
+      <div class="line-chart">
+        <svg viewBox="0 0 260 70" preserveAspectRatio="none">
+          <polyline points="0,60 52,50 104,42 156,28 208,18 260,8" fill="none" stroke="#4ecdc4" stroke-width="2"/>
+          <polyline points="0,60 52,50 104,42 156,28 208,18 260,8 260,70 0,70" fill="url(#grad)" stroke="none"/>
+          <defs><linearGradient id="grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4ecdc4" stop-opacity=".2"/><stop offset="100%" stop-color="#4ecdc4" stop-opacity="0"/></linearGradient></defs>
+          <circle cx="0" cy="60" r="3" fill="#4ecdc4"/>
+          <circle cx="52" cy="50" r="3" fill="#4ecdc4"/>
+          <circle cx="104" cy="42" r="3" fill="#4ecdc4"/>
+          <circle cx="156" cy="28" r="3" fill="#4ecdc4"/>
+          <circle cx="208" cy="18" r="3" fill="#4ecdc4"/>
+          <circle cx="260" cy="8" r="3" fill="#4ecdc4"/>
+        </svg>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text3);margin-top:4px">
+        <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
+      </div>
+    </div>
+    <div class="an-card">
+      <div class="an-title">ATE Test pass rate by model</div>
+      <div class="bar-chart" style="height:80px">
+        <div class="bar-wrap"><div class="bar-val">96%</div><div class="bar" style="height:77px;background:var(--green)"></div><div class="bar-lbl">NS1000</div></div>
+        <div class="bar-wrap"><div class="bar-val">94%</div><div class="bar" style="height:75px;background:var(--green)"></div><div class="bar-lbl">NS3000</div></div>
+        <div class="bar-wrap"><div class="bar-val">98%</div><div class="bar" style="height:78px;background:var(--green)"></div><div class="bar-lbl">NS2000</div></div>
+        <div class="bar-wrap"><div class="bar-val">91%</div><div class="bar" style="height:73px;background:var(--yellow)"></div><div class="bar-lbl">NS21</div></div>
+        <div class="bar-wrap"><div class="bar-val">88%</div><div class="bar" style="height:70px;background:var(--yellow)"></div><div class="bar-lbl">NS10</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Order Fulfillment</div>
+    <table>
+      <thead><tr><th>Order</th><th>Client</th><th>Required</th><th>Ready</th><th>Missing</th><th>Due</th><th>Fulfillment</th></tr></thead>
+      <tbody>
+        <tr><td><b>SO25000172</b></td><td style="font-size:10px">SOUTHEASTASIANET</td><td>8</td><td>5</td><td><span style="color:var(--yellow)">3</span></td><td style="font-size:10px">15/07/26</td><td><div class="prog-wrap" style="min-width:80px"><div class="prog-fill" style="width:62%;background:var(--yellow)"></div></div></td></tr>
+        <tr><td><b>SO25000156</b></td><td style="font-size:10px">LINK-COM TELECOM</td><td>5</td><td>5</td><td><span style="color:var(--green)">0</span></td><td style="font-size:10px">01/07/26</td><td><div class="prog-wrap" style="min-width:80px"><div class="prog-fill" style="width:100%"></div></div></td></tr>
+        <tr><td><b>SO25000180</b></td><td style="font-size:10px">VIASAT ISRAEL</td><td>12</td><td>3</td><td><span style="color:var(--red)">9</span></td><td style="font-size:10px">30/08/26</td><td><div class="prog-wrap" style="min-width:80px"><div class="prog-fill" style="width:25%;background:#60a0e0"></div></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</main>
+</div>
+</div>
+
+<!-- ══════════════ MODAL: BATCH TEMP ══════════════ -->
+<div class="modal-overlay" id="modal-temp">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title">⚠ Create TEMP Units — Batch</div>
+      <div class="modal-close" onclick="closeModal('modal-temp')">✕</div>
+    </div>
+    <div class="m-row"><div class="m-lbl">Model</div>
+      <select class="m-val f-select" style="width:100%"><option>NS1000</option><option>NS3000</option><option>NS21</option><option>NS10</option><option>NS2000</option></select>
+    </div>
+    <div class="m-row"><div class="m-lbl">Quantity (1–100)</div><input class="m-val" type="number" value="5" min="1" max="100"></div>
+    <div class="m-row"><div class="m-lbl">Unit Type</div>
+      <select class="m-val f-select" style="width:100%"><option>New</option><option>Used</option></select>
+    </div>
+    <div class="m-row"><div class="m-lbl">Comment (applied to all)</div><input class="m-val" value="Batch received 29-Jun-2026"></div>
+    <div class="m-info">Serials will be auto-generated: TEMP-20260629-01 … TEMP-20260629-05<br>Status: NEW · Burn-In lock active · Cannot be assigned to orders until real serial entered.</div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="btn btn-p" onclick="closeModal('modal-temp')">✓ Create 5 TEMP Units</button>
+      <button class="btn btn-s" onclick="closeModal('modal-temp')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ MODAL: BATCH UPDATE ══════════════ -->
+<div class="modal-overlay" id="modal-batch">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title">🔄 Batch Update — 2 units selected</div>
+      <div class="modal-close" onclick="closeModal('modal-batch')">✕</div>
+    </div>
+    <div class="m-row"><div class="m-lbl">Global Status</div>
+      <select class="m-val f-select" style="width:100%"><option>— no change —</option><option>NEW</option><option>IN PROGRESS</option><option>READY</option><option>HOLD</option></select>
+    </div>
+    <div class="m-row"><div class="m-lbl">SW Version</div>
+      <select class="m-val f-select" style="width:100%"><option>— no change —</option><option>PASS</option><option>IN PROGRESS</option><option>FAILED</option><option>NOT REQ</option></select>
+    </div>
+    <div class="m-row"><div class="m-lbl">ATE Test</div>
+      <select class="m-val f-select" style="width:100%"><option>— no change —</option><option>PASS</option><option>IN PROGRESS</option><option>FAILED</option></select>
+    </div>
+    <div class="m-row"><div class="m-lbl">Comment (append to existing)</div><input class="m-val" placeholder="Add comment..."></div>
+    <div class="m-info">TEMP units with Burn-In not passed will be skipped automatically.<br>Selected: 3007240066, 2517240046</div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="btn btn-p" onclick="closeModal('modal-batch')">✓ Apply to 2 units</button>
+      <button class="btn btn-s" onclick="closeModal('modal-batch')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- DEMO BAR -->
+<div class="demo-bar">
+  <span>●</span><b>BEL System</b> — Interactive Demo &nbsp;|&nbsp; Developed for AYECKA &nbsp;|&nbsp; Specification v1.3 &nbsp;|&nbsp; <span style="opacity:.6">Click rows · sidebar · buttons to navigate</span>
+</div>
+
+<script>
+function doLogin() {
+  document.getElementById('login-page').style.display = 'none';
+  document.getElementById('main-app').style.display = 'flex';
+  document.getElementById('main-app').style.flexDirection = 'column';
+  document.getElementById('main-app').style.flex = '1';
+}
+
+function showPage(pageId, sidebarEl) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const pg = document.getElementById('page-' + pageId);
+  if (pg) pg.classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  if (sidebarEl) sidebarEl.classList.add('active');
+}
+
+function showDevice(serial) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  if (serial.startsWith('TEMP')) {
+    document.getElementById('page-device-temp').classList.add('active');
+  } else if (serial.startsWith('XT')) {
+    document.getElementById('page-device-xtream').classList.add('active');
+  } else {
+    document.getElementById('page-device-normal').classList.add('active');
+  }
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ── ORDER DATA ───────────────────────────────────────────────────────────
+const ORDERS = {
+  'SO25000172': {
+    client:'SOUTHEASTASIANET Myanmar', model:'NS3000', due:'15/07/26',
+    priority:'<span class="b b-r">HIGH</span>',
+    status:'<span class="b b-y" style="font-size:11px">● IN PROGRESS</span>',
+    qty:8,
+    units:[
+      {serial:'3007240066', model:'NS3000', type:'Used', burnin:'PASS', ate:'PASS', cal:'PASS', sw:'PASS', status:'READY', sc:'b-g'},
+      {serial:'3049230032', model:'NS3000', type:'Used', burnin:'PASS', ate:'PASS', cal:'PASS', sw:'PASS', status:'READY', sc:'b-g'},
+      {serial:'3049230041', model:'NS3000', type:'New',  burnin:'PASS', ate:'PASS', cal:'PASS', sw:'PASS', status:'READY', sc:'b-g'},
+      {serial:'3049230055', model:'NS3000', type:'New',  burnin:'PASS', ate:'IN PROG', cal:'—', sw:'—', status:'IN PROGRESS', sc:'b-y'},
+      {serial:'3049230061', model:'NS3000', type:'New',  burnin:'PASS', ate:'IN PROG', cal:'—', sw:'—', status:'IN PROGRESS', sc:'b-y'},
+      {serial:'2517240046', model:'NS21',   type:'New',  burnin:'PASS', ate:'PASS', cal:'N/REQ', sw:'PASS', status:'READY', sc:'b-g'},
+      {serial:'XT-001',     model:'Xtream', type:'New',  burnin:'N/A',  ate:'N/A',  cal:'N/A',  sw:'N/A',  status:'IN PROGRESS', sc:'b-y', isXt:true},
+      {serial:'TEMP-20260624-01', model:'NS3000', type:'New', burnin:'IN PROG', ate:'—', cal:'—', sw:'—', status:'NEW', sc:'b-new', isTemp:true},
+    ]
+  },
+  'SO25000156': {
+    client:'LINK-COM TELECOM LTD', model:'NS1000', due:'01/07/26',
+    priority:'<span class="b b-y">MED</span>',
+    status:'<span class="b b-g" style="font-size:11px">● READY</span>',
+    qty:5,
+    units:[
+      {serial:'1006240011', model:'NS1000', type:'Used', burnin:'PASS', ate:'PASS', cal:'PASS', sw:'PASS', status:'READY', sc:'b-g'},
+      {serial:'1006240022', model:'NS1000', type:'Used', burnin:'PASS', ate:'PASS', cal:'PASS', sw:'PASS', status:'READY', sc:'b-g'},
+      {serial:'1006240033', model:'NS1000', type:'New',  burnin:'PASS', ate:'PASS', cal:'PASS', sw:'PASS', status:'READY', sc:'b-g'},
+      {serial:'1006240044', model:'NS1000', type:'New',  burnin:'PASS', ate:'PASS', cal:'PASS', sw:'PASS', status:'READY', sc:'b-g'},
+      {serial:'1006240055', model:'NS1000', type:'New',  burnin:'PASS', ate:'PASS', cal:'PASS', sw:'PASS', status:'READY', sc:'b-g'},
+    ]
+  },
+  'SO25000180': {
+    client:'VIASAT ISRAEL LTD', model:'NS1000', due:'30/08/26',
+    priority:'<span class="b b-gr">LOW</span>',
+    status:'<span class="b b-bl" style="font-size:11px">● OPEN</span>',
+    qty:12,
+    units:[
+      {serial:'1046250001', model:'NS1000', type:'New', burnin:'PASS', ate:'PASS', cal:'PASS', sw:'PASS', status:'READY', sc:'b-g'},
+      {serial:'1046250002', model:'NS1000', type:'New', burnin:'PASS', ate:'PASS', cal:'PASS', sw:'PASS', status:'READY', sc:'b-g'},
+      {serial:'1046250003', model:'NS1000', type:'New', burnin:'PASS', ate:'IN PROG', cal:'—', sw:'—', status:'IN PROGRESS', sc:'b-y'},
+      {serial:'TEMP-20260629-01', model:'NS1000', type:'New', burnin:'—', ate:'—', cal:'—', sw:'—', status:'NEW', sc:'b-new', isTemp:true},
+      {serial:'TEMP-20260629-02', model:'NS1000', type:'New', burnin:'—', ate:'—', cal:'—', sw:'—', status:'NEW', sc:'b-new', isTemp:true},
+      {serial:'TEMP-20260629-03', model:'NS1000', type:'New', burnin:'—', ate:'—', cal:'—', sw:'—', status:'NEW', sc:'b-new', isTemp:true},
+    ]
+  }
+};
+
+function bv(v) {
+  if (!v||v==='—') return '<span class="b b-gr">—</span>';
+  if (v==='PASS')    return '<span class="b b-g">PASS</span>';
+  if (v==='FAILED')  return '<span class="b b-r">FAILED</span>';
+  if (v==='IN PROG') return '<span class="b b-y">IN PROG</span>';
+  if (v==='N/REQ')   return '<span class="b b-gr">N/REQ</span>';
+  if (v==='N/A')     return '<span class="b b-gr">N/A</span>';
+  return `<span class="b b-gr">${v}</span>`;
+}
+
+function showOrder(orderId) {
+  const o = ORDERS[orderId];
+  if (!o) return;
+
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-order-detail').classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  document.querySelector('[onclick*="orders"]').classList.add('active');
+
+  document.getElementById('od-title').textContent = 'Order ' + orderId;
+  document.getElementById('od-status-badge').innerHTML = o.status;
+  document.getElementById('od-client').textContent = o.client;
+  document.getElementById('od-model').textContent = o.model;
+  document.getElementById('od-due').textContent = o.due;
+  document.getElementById('od-priority').innerHTML = o.priority;
+
+  const ready  = o.units.filter(u => u.status === 'READY').length;
+  const active = o.units.filter(u => u.status === 'IN PROGRESS' || u.status === 'NEW').length;
+  const missing = Math.max(0, o.qty - o.units.length);
+
+  document.getElementById('od-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-num">${o.qty}</div><div class="stat-label">Required</div></div>
+    <div class="stat-card"><div class="stat-num green">${ready}</div><div class="stat-label">READY</div></div>
+    <div class="stat-card"><div class="stat-num yellow">${active}</div><div class="stat-label">In Progress / New</div></div>
+    <div class="stat-card"><div class="stat-num red">${missing}</div><div class="stat-label">Still Missing</div></div>
+  `;
+
+  document.getElementById('od-units-body').innerHTML = o.units.map(u => {
+    const sDisplay = u.isTemp
+      ? `<span style="color:#ffaa00">⚠ ${u.serial}</span>`
+      : u.isXt
+        ? `<span style="color:var(--amber)">🖥 ${u.serial}</span>`
+        : `<span style="color:var(--accent);font-weight:600">${u.serial}</span>`;
+    const click = `onclick="showDeviceFromOrder('${u.serial}')"`;
+    return `<tr ${click} style="cursor:pointer">
+      <td>${sDisplay}</td>
+      <td>${u.model}</td>
+      <td><span class="b ${u.isTemp?'b-temp':'b-gr'}">${u.type}</span></td>
+      <td>${bv(u.burnin)}</td><td>${bv(u.ate)}</td><td>${bv(u.cal)}</td><td>${bv(u.sw)}</td>
+      <td><span class="b ${u.sc}"><span class="dot"></span>${u.status}</span></td>
+      <td><button class="btn btn-s btn-sm" onclick="event.stopPropagation();showDeviceFromOrder('${u.serial}')">→ Open</button></td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('od-footer').textContent =
+    `${o.units.length} units assigned · ${ready} READY · ${active} in progress · ${missing} still needed`;
+}
+
+function showDeviceFromOrder(serial) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  if (serial.startsWith('TEMP')) {
+    document.getElementById('page-device-temp').classList.add('active');
+  } else if (serial.startsWith('XT')) {
+    document.getElementById('page-device-xtream').classList.add('active');
+  } else {
+    document.getElementById('page-device-normal').classList.add('active');
+  }
+}
+</script>
+</body>
+</html>
